@@ -49,7 +49,7 @@ jobs:
       - name: shout out tags
         shell: bash
         env:
-            tag: ${{ TAG }}
+            tag: ${{ env.TAG }}
         run: |
             echo "tag is : $tag"
 
