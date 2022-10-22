@@ -1,6 +1,8 @@
 name: Build Release
 
 on:
+  schedule:
+    - cron: '36 * * * * *'
   workflow_dispatch:
 
   push:
@@ -12,7 +14,24 @@ on:
       - devel
 
 jobs:
-   simply-pull:
+  check_date:
+      runs-on: ubuntu-20.04
+      name: Check latest commit
+      outputs:
+        should_run: ${{ steps.should_run.outputs.should_run }}
+      steps:
+        - uses: actions/checkout@v2
+        - name: print latest_commit
+          run: echo ${{ github.sha }}
+      - id: should_run
+        continue-on-error: true
+        name: check latest commit is less than a day
+        if: ${{ github.event_name == 'schedule' }}
+        run: test -z $(git rev-list  --after="1 hours"  ${{ github.sha }}) &amp;&amp; echo "::set-output name=should_run::false"
+
+  simply-pull:
+    needs: check_date
+    if: ${{ needs.check_date.outputs.should_run != 'false' }}
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
