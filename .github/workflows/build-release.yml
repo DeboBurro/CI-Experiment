@@ -70,13 +70,14 @@ jobs:
             echo "TAG_VERSION from git tag : $TAG_VERSION"
             echo "TAG_SUFFIX from git tag : $TAG_SUFFIX"
             if [[ $TAG_VERSION == 'devel' ]]; then
-              sed -i "/^export BURRO_VERSION=/c\export BURRO_VERSION=$TAG_VERSION" version.txt
+              sed -i "/^export BURRO_VERSION_TAG=/c\export BURRO_VERSION_TAG=${{ env.TAG }}" version.txt
             else
                [[ "$BURRO_VERSION" != "$TAG_VERSION"  ]] && echo "ERROR: $BURRO_VERSION is not same as $TAG_VERSION" && exit 1
+               sed -i "/^export BURRO_VERSION_TAG=/c\export BURRO_VERSION_TAG=$TAG_SUFFIX" version.txt
             fi
 
             # every line begins with the 'export BURRO_VERSION_TAG=' will be replaced with 'export BURRO_VERSION_TAG=$TAG_SUFFIX'
-            sed -i "/^export BURRO_VERSION_TAG=/c\export BURRO_VERSION_TAG=$TAG_SUFFIX" version.txt
+            # sed -i "/^export BURRO_VERSION_TAG=/c\export BURRO_VERSION_TAG=$TAG_SUFFIX" version.txt
       
       - name: show the content of the version.txt
         run: cat version.txt
