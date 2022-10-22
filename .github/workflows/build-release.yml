@@ -23,3 +23,34 @@ jobs:
       - name: step2
         run: echo 'hihi'
 
+      - name: Set variables
+        id: vars
+        run: |
+            echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+            datetime=$(echo ${{ github.event.repository.updated_at}} | sed 's/:/./g')
+            echo "::set-output name=datetime::${datetime}"
+
+      - name: Create component tag, based on devel branch or tag
+        run: |
+            tag="${GITHUB_REF/refs\/tags\//}"
+            if [[ ! -z $tag ]]; then
+              echo "TAG=${tag:1}" >> $GITHUB_ENV
+            else
+              echo 'The release tag is empty, going to use devel branch to create tag name'
+              # branch_name=${GITHUB_REF_NAME}
+              tag="devel-${{ steps.vars.outputs.sha_short }}-${{ steps.vars.outputs.sha_short }}"
+              echo "TAG=${tag:1}" >> $GITHUB_ENV
+            fi
+
+            # replace all occurence of '-' with '.' so greengrass components could be created
+            component_tag=$(echo "${tag}" | tr '-' '.')
+            echo "COMPONENT_TAG=${component_tag:1}" >> $GITHUB_ENV
+
+      - name: shout out tags
+        shell: bash
+        env:
+            tag: ${{ TAG }}
+        run: |
+            echo "tag is : $tag"
+
+
