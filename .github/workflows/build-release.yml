@@ -33,12 +33,16 @@ jobs:
       - name: Create component tag, based on devel branch or tag
         run: |
             tag="${GITHUB_REF/refs\/tags\//}"
+            echo $tag
+            echo ${tag}
             if [[ ! -z $tag ]]; then
               echo "TAG=${tag:1}" >> $GITHUB_ENV
             else
               echo 'The release tag is empty, going to use devel branch to create tag name'
               # branch_name=${GITHUB_REF_NAME}
               tag="devel-${{ steps.vars.outputs.sha_short }}-${{ steps.vars.outputs.sha_short }}"
+              echo "${tag}"
+              echo "$tag"
               echo "TAG=${tag:1}" >> $GITHUB_ENV
             fi
 
