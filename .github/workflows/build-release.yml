@@ -40,7 +40,8 @@ jobs:
             else
               echo 'The release tag is empty, going to use devel branch to create tag name'
               # branch_name=${GITHUB_REF_NAME}
-              tag="devel-${{ steps.vars.outputs.sha_short }}-${{ steps.vars.outputs.datetime }}"
+              #tag="devel-${{ steps.vars.outputs.sha_short }}-${{ steps.vars.outputs.datetime }}"
+              tag="devel-${{ steps.vars.outputs.sha_short }}"
               echo "${tag}"
               echo "$tag"
               echo "TAG=${tag}" >> $GITHUB_ENV
@@ -57,4 +58,26 @@ jobs:
         run: |
             echo "tag is : $tag"
 
+      - name: Replace the version tag in version.txt with git tag suffix
+        run: |
+            TAG_VERSION=$( cut -d '-' -f 1 <<< "${{ env.TAG }}" )
+            TAG_SUFFIX=$( cut -d '-' -f 2- <<< "${{ env.TAG }}" )
+
+            # extract version after BURRO_VERSION
+            BURRO_VERSION=$(sed -n "/BURRO_VERSION=/p"  version.txt | cut -d '=' -f 2-)
+            echo "BURRO_VERSION=${BURRO_VERSION}" >> $GITHUB_ENV
+            echo "BURRO_VERSION from the version.txt : $BURRO_VERSION"
+            echo "TAG_VERSION from git tag : $TAG_VERSION"
+            echo "TAG_SUFFIX from git tag : $TAG_SUFFIX"
+            if [[ $TAG_VERSION == 'devel' ]]; then
+              sed -i "/^export BURRO_VERSION=/c\export BURRO_VERSION=$TAG_VERSION" version.txt
+            else
+               [[ "$BURRO_VERSION" != "$TAG_VERSION"  ]] && echo "ERROR: $BURRO_VERSION is not same as $TAG_VERSION" && exit 1
+            fi
+
+            # every line begins with the 'export BURRO_VERSION_TAG=' will be replaced with 'export BURRO_VERSION_TAG=$TAG_SUFFIX'
+            sed -i "/^export BURRO_VERSION_TAG=/c\export BURRO_VERSION_TAG=$TAG_SUFFIX" version.txt
+      
+       - name: show the content of the version.txt
+         run: cat version.txt
 
