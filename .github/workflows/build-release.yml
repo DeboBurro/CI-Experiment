@@ -35,7 +35,7 @@ jobs:
             tag="${GITHUB_REF/refs\/tags\//}"
             echo $tag
             echo ${tag}
-            if [[ ! -z $tag ]]; then
+            if [[ $tag == v* ]]; then
               echo "TAG=${tag:1}" >> $GITHUB_ENV
             else
               echo 'The release tag is empty, going to use devel branch to create tag name'
