@@ -21,5 +21,5 @@ jobs:
            submodules: recursive
 
       - name: step2
-        run: echo 'hi'
+        run: echo 'hihi'
 
