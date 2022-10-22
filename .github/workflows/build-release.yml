@@ -82,3 +82,7 @@ jobs:
       - name: show the content of the version.txt
         run: cat version.txt
 
+      - name: check all global variables
+        run: |
+             echo "COMPONENT_TAG = ${{ env.COMPONENT_TAG }}"
+             echo "TAG = ${{ env.TAG }}"
