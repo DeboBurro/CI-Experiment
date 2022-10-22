@@ -78,6 +78,6 @@ jobs:
             # every line begins with the 'export BURRO_VERSION_TAG=' will be replaced with 'export BURRO_VERSION_TAG=$TAG_SUFFIX'
             sed -i "/^export BURRO_VERSION_TAG=/c\export BURRO_VERSION_TAG=$TAG_SUFFIX" version.txt
       
-       - name: show the content of the version.txt
-         run: cat version.txt
+      - name: show the content of the version.txt
+        run: cat version.txt
 
