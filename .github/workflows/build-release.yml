@@ -28,7 +28,7 @@ jobs:
         name: check latest commit is less than a day
         run: |
             echo "should_run=true" >> $GITHUB_OUTPUT
-            test -z "$(git log --since='1 hours ago')" && echo "should_run=false" >> $GITHUB_OUTPUT
+            test -n "$(git log --since='1 hours ago')" || echo "should_run=false" >> $GITHUB_OUTPUT
 
   simply-pull:
     needs: check_date
