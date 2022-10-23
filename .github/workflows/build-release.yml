@@ -46,9 +46,9 @@ jobs:
       - name: Set variables
         id: vars
         run: |
-            echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+            echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
             datetime=$(echo ${{ github.event.repository.updated_at}} | sed 's/:/./g')
-            echo "::set-output name=datetime::${datetime}"
+            echo "datetime=$datetime" >> $GITHUB_OUTPUT
 
       - name: Create component tag, based on devel branch or tag
         run: |
