@@ -26,15 +26,14 @@ jobs:
         shell : bash
         run: echo ${{ github.sha }}
       - id: should_run
-        continue-on-error: true
         name: check latest commit is less than a day
-        if: ${{ github.event_name == 'schedule' }}
         run: |
-            test -z "$(git log --since='1 hours ago')" || echo "::set-output name=should_run::false"
+            echo "::set-output name=should_run::true"
+            test -z "$(git log --since='1 hours ago')" && echo "::set-output name=should_run::false"
 
   simply-pull:
     needs: check_date
-    if: ${{ needs.check_date.outputs.should_run != 'false' }}
+    if: ${{ needs.check_date.outputs.should_run == 'true' }}
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
