@@ -23,12 +23,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: print latest_commit
+        shell : bash
         run: echo ${{ github.sha }}
       - id: should_run
         continue-on-error: true
         name: check latest commit is less than a day
         if: ${{ github.event_name == 'schedule' }}
-        run: test -z $(git rev-list  --after="1 hours"  ${{ github.sha }}) &amp;&amp; echo "::set-output name=should_run::false"
+        run: |
+            test -z "$(git log --since='1 hours ago')" || echo "::set-output name=should_run::false"
 
   simply-pull:
     needs: check_date
