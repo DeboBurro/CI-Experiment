@@ -48,21 +48,21 @@ jobs:
         run: |
             echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
             datetime=$(echo ${{ github.event.repository.updated_at}} | sed 's/:/./g')
-            echo "datetime=$datetime" >> $GITHUB_OUTPUT
+            EDT_DATETIME=$(date --date="$(TZ=UTC+4 date -R)" "+%Y%m%d-%H%M%S")
+            echo "EDT_DATETIME=$EDT_DATETIME" >> $GITHUB_OUTPUT
 
       - name: Create component tag, based on devel branch or tag
         run: |
-            tag="${GITHUB_REF/refs\/tags\//}"
+            tag=$GITHUB_REF_NAME
+            # tag="${GITHUB_REF/refs\/tags\//}"
             echo $tag
             echo ${tag}
             if [[ $tag == v* ]]; then
               echo "TAG=${tag:1}" >> $GITHUB_ENV
             else
               echo 'The release tag is empty, going to use devel branch to create tag name'
-              # branch_name=${GITHUB_REF_NAME}
               #tag="devel-${{ steps.vars.outputs.sha_short }}-${{ steps.vars.outputs.datetime }}"
-              BURRO_VERSION=$(sed -n "/BURRO_VERSION=/p"  version.txt | cut -d '=' -f 2-)
-              tag="$BURRO_VERSION-devel-${{ steps.vars.outputs.sha_short }}"
+              tag="0.0.0-$GITHUB_REF_NAME-${{ steps.vars.outputs.EDT_DATETIME }}-${{ steps.vars.outputs.sha_short }}"
               echo "${tag}"
               echo "$tag"
               echo "TAG=${tag}" >> $GITHUB_ENV
@@ -95,8 +95,10 @@ jobs:
             echo "BURRO_VERSION from the version.txt : $BURRO_VERSION"
             echo "TAG_VERSION from git tag : $TAG_VERSION"
             echo "TAG_SUFFIX from git tag : $TAG_SUFFIX"
-            if [[ $TAG_VERSION == 'devel' ]]; then
-              sed -i "/^export BURRO_VERSION_TAG=/c\export BURRO_VERSION_TAG=${{ env.TAG }}" version.txt
+            # Assuming the action is trigger from a branch not a tag
+            if [[ $GITHUB_REF_NAME != v* ]]; then
+              sed -i "/^export BURRO_VERSION=/c\export BURRO_VERSION=$TAG_VERSION" version.txt
+              sed -i "/^export BURRO_VERSION_TAG=/c\export BURRO_VERSION_TAG=$TAG_SUFFIX" version.txt
             else
                [[ "$BURRO_VERSION" != "$TAG_VERSION"  ]] && echo "ERROR: $BURRO_VERSION is not same as $TAG_VERSION" && exit 1
                sed -i "/^export BURRO_VERSION_TAG=/c\export BURRO_VERSION_TAG=$TAG_SUFFIX" version.txt
