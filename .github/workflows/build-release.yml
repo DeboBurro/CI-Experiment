@@ -2,7 +2,7 @@ name: Build Release
 
 on:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '*/10 * * * *'
 
   workflow_dispatch:
 
@@ -30,7 +30,9 @@ jobs:
         name: check latest commit is less than a day
         run: |
             echo "should_run=true" >> $GITHUB_OUTPUT
-            test -n "$(git log --since='1 hours ago')" || echo "should_run=false" >> $GITHUB_OUTPUT
+            test -n "$(git log --since='10 minutes ago')" || echo "should_run=false" >> $GITHUB_OUTPUT
+      - run: echo "event name is:" ${{ github.event_name }}
+      - run: echo "event type is:" ${{ github.event.action }} 
 
   simply-pull:
     needs: check_date
