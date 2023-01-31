@@ -30,11 +30,11 @@ jobs:
         name: check latest commit is less than a day
         run: |
             echo "should_run=true" >> $GITHUB_OUTPUT
-            test -n "$(git log --since='24 hours ago')" || echo "should_run=false" >> $GITHUB_OUTPUT
+            test -n "$(git log --since='1 hours ago')" || echo "should_run=false" >> $GITHUB_OUTPUT
 
   simply-pull:
     needs: check_date
-    if: ${{ needs.check_date.outputs.should_run == 'true' }}
+    if: ${{ needs.check_date.outputs.should_run == 'true' ||  github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
