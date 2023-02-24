@@ -1,0 +1,16 @@
+name: Artifact-Test
+on:
+  repository_dispatch:
+    types: [release-build-success]
+
+jobs:
+  build_tests:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.client_payload.ref }}
+
+      - name: should the workflow type
+        run: echo ${{ github.event.client_payload.workflowtype }}
+
