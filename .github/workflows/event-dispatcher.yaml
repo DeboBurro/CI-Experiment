@@ -1,0 +1,30 @@
+name: Event Dispatcher
+
+on:
+
+  workflow_dispatch:
+
+  push:
+    # Any git tag starts with `v` be pushed to the repo will trigger this workflow
+    # ex: `git push origin v1.0` or `git push origin v2.6.6`
+    tags:
+      - v*
+    branches:
+      - devel
+
+jobs:
+  simply-dispath:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+           submodules: recursive
+
+
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          event-type: release-build-success
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "workflowtype": "release"}'
+
